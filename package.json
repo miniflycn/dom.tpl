@@ -1,0 +1,25 @@
+{
+  "name": "dom.tpl",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "htmlparser2": "^3.8.2",
+    "micro-tpl": "^0.4.0",
+    "utils-merge": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miniflycn/dom.tpl.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/miniflycn/dom.tpl/issues"
+  },
+  "homepage": "https://github.com/miniflycn/dom.tpl"
+}
