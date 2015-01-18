@@ -115,5 +115,45 @@ var domTpl = new DOMTpl({
 });
 ```
 
+##### 默认方法
 
+* get的默认为：
+
+```javascript
+// 即直接返回值，不进行prefix
+get: function (value) {
+  return value;
+}
+```
+
+* applyFilters默认为：
+
+```javascript
+// 如果输入为filters = ['filter1 arg', 'filter2'], value = message，则输出为：filter2(filter1(message, 'arg'))
+applyFilters: function (filters, value, options) {
+   var args, foo;
+   if (filters.length) {
+     filters.forEach(function (filter) {
+       args = filter.split(/ +/);
+       foo = args.shift();
+       if (options.filters[foo]) {
+         value = [value]
+         value.push.apply(value, args);
+         value = options.filters[foo].apply(this, value);
+       } else {
+         value = [
+           value
+         ];
+         args = args.map(function (arg) {
+           return "\'" + arg + "\'";
+         });
+         args.unshift(1, 0);
+         value.splice.apply(value, args);
+         value = foo + '(' + value.join(', ') + ')';
+       }
+     })
+   }
+   return value;
+ }
+```
 
