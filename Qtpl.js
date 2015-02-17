@@ -22,7 +22,7 @@ var domTpl = new DOMTpl({
         });
         args.unshift(1, 0);
         value.splice.apply(value, args);
-        value = 'opt.filters.' + foo + '(' + value.join(', ') + ')';
+        value = '(opt.filters.' + foo + ' ? opt.filters.' + foo + ' : opt.filters.turnback)(' + value.join(', ') + ')';
       })
     }
     return value;
@@ -38,7 +38,8 @@ var domTpl = new DOMTpl({
 module.exports = function (str, options) {
   return mTpl(
     domTpl.tpl(
-      str
+      str,
+      options
     ).replace(/\{\{/g, '<%').replace(/\}\}/g, '%>'),
     extend({ ret: 'function' }, options)
   );

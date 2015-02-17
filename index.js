@@ -2,6 +2,7 @@ var htmlparser = require('htmlparser2')
   , DomUtils = htmlparser.DomUtils
   , parser = require('./lib/parser')
   , extend = require('./lib/extend')
+  , isCustom = require('./lib/custom')
   , G_OPTIONS = {
     get: function (value) {
       return value;
@@ -34,13 +35,22 @@ var htmlparser = require('htmlparser2')
   };
 
 function find(foo, elems) {
-  var childs, elem;
+  var childs, elem, tmp;
   for (var i = 0, j = elems.length; i < j; i++) {
     elem = elems[i];
-    if (elem.type === 'tag' && !foo(elem)) {
-      childs = elem.children;
-      childs && 
-        find(foo, childs);
+    if (elem.type === 'tag') {
+      if (isCustom(elem.name) && this.oncustomElement) {
+        tmp = this.oncustomElement(elem);
+        typeof tmp === 'string' &&
+          (tmp = new htmlparser.parseDOM(tmp)[0]);
+        DomUtils.replaceElement(elem, tmp);
+        elem = tmp;
+      }
+      if (!foo(elem)) {
+        childs = elem.children;
+        childs && 
+          find.call(this, foo, childs);
+      }
     }
   }
 }
@@ -49,12 +59,12 @@ function DOMTpl(options) {
   var DEFAULT = extend({}, G_OPTIONS, options);
   this.tpl = function (string, options) {
     options = extend({}, DEFAULT, options);
-    var dom = new htmlparser.parseDOM(string)
+    var dom = new htmlparser.parseDOM('<div>' + string + '</div>')
       , prefix = options.prefix || DEFAULT.prefix || 'q-'
       , start = prefix.length
       , directives = extend({}, options.directives, DEFAULT.directives)
       , filters = extend({}, options.filters, DEFAULT.filters);
-    find(function (ele) {
+    find.call(options, function (ele) {
       var attribs = Object.keys(ele.attribs);
       attribs
         .filter(function (key) {
@@ -79,7 +89,7 @@ function DOMTpl(options) {
         });
       return ~attribs.indexOf(prefix + 'repeat');
     }, dom);
-    return DomUtils.getOuterHTML(dom[0]);
+    return DomUtils.getOuterHTML(dom[0].children[0]);
   };
 }
 

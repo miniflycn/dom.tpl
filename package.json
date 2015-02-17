@@ -1,6 +1,6 @@
 {
   "name": "dom.tpl",
-  "version": "0.0.0",
+  "version": "0.0.3",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -8,7 +8,10 @@
     "micro-tpl": "^0.4.0",
     "utils-merge": "^1.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
   "scripts": {
     "test": "mocha"
   },
