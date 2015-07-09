@@ -34,21 +34,30 @@ var htmlparser = require('htmlparser2')
     }
   };
 
+function transformEle(elem, oncustomElement) {
+  var tmp;
+  if (!oncustomElement) return elem;
+  if (isCustom(elem.name)) {
+    tmp = oncustomElement(elem);
+    if (elem === tmp) return elem;
+    typeof tmp === 'string' &&
+      (tmp = new htmlparser.parseDOM(tmp)[0]);
+    DomUtils.replaceElement(elem, tmp);
+    return transformEle(tmp, oncustomElement);
+  } else {
+    return elem;
+  }
+}
+
 function find(foo, elems) {
   var childs, elem, tmp;
   for (var i = 0, j = elems.length; i < j; i++) {
     elem = elems[i];
     if (elem.type === 'tag') {
-      if (isCustom(elem.name) && this.oncustomElement) {
-        tmp = this.oncustomElement(elem);
-        typeof tmp === 'string' &&
-          (tmp = new htmlparser.parseDOM(tmp)[0]);
-        DomUtils.replaceElement(elem, tmp);
-        elem = tmp;
-      }
+      elem =  transformEle(elem, this.oncustomElement);
       if (!foo(elem)) {
         childs = elem.children;
-        childs && 
+        childs &&
           find.call(this, foo, childs);
       }
     }
