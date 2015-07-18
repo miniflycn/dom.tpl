@@ -49,7 +49,21 @@ function transformEle(elem, oncustomElement) {
   }
 }
 
-function find(foo, elems) {
+/**
+ * transformEleTest
+ * @return {Boolean} transform success or not
+ */
+function transformEleTest(elem, oncustomElement) {
+  var tmp;
+  if (!oncustomElement) return false;
+  if (isCustom(elem.name)) {
+    tmp = oncustomElement(elem);
+    if (elem === tmp) return false;
+    return true;
+  }
+}
+
+function walk(foo, elems) {
   var childs, elem, tmp;
   for (var i = 0, j = elems.length; i < j; i++) {
     elem = elems[i];
@@ -58,8 +72,21 @@ function find(foo, elems) {
       if (!foo(elem)) {
         childs = elem.children;
         childs &&
-          find.call(this, foo, childs);
+          walk.call(this, foo, childs);
       }
+    }
+  }
+}
+
+function find(foo, elems) {
+  var childs, elem, tmp;
+  for (var i = 0, j = elems.length; i < j; i++) {
+    elem = elems[i];
+    if (elem.type === 'tag') {
+      transformEleTest(elem, this.oncustomElement);
+      childs = elem.children;
+      childs &&
+        find.call(this, foo, childs);
     }
   }
 }
@@ -72,12 +99,10 @@ function DOMTpl(options) {
       , prefix = options.prefix || DEFAULT.prefix || 'q-'
       , start = prefix.length
       , directives = extend({}, options.directives, DEFAULT.directives)
-      , filters = extend({}, options.filters, DEFAULT.filters);
+      , filters = extend({}, options.filters, DEFAULT.filters)
+      , traverse = options.justFind ? find : walk;
 
-    // attched domCreated event
-    options.domCreated && options.domCreated(dom);
-
-    find.call(options, function (ele) {
+    traverse.call(options, function (ele) {
       var attribs = Object.keys(ele.attribs);
       attribs
         .filter(function (key) {
