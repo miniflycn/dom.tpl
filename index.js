@@ -73,6 +73,10 @@ function DOMTpl(options) {
       , start = prefix.length
       , directives = extend({}, options.directives, DEFAULT.directives)
       , filters = extend({}, options.filters, DEFAULT.filters);
+
+    // attched domCreated event
+    options.domCreated && options.domCreated(dom);
+
     find.call(options, function (ele) {
       var attribs = Object.keys(ele.attribs);
       attribs
