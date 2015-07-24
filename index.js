@@ -69,10 +69,13 @@ function walk(foo, elems) {
     elem = elems[i];
     if (elem.type === 'tag') {
       elem =  transformEle(elem, this.oncustomElement);
+      childs = elem.children;
       if (!foo(elem)) {
-        childs = elem.children;
         childs &&
           walk.call(this, foo, childs);
+      } else {
+        childs &&
+          walk.call(this, function () {}, childs);
       }
     }
   }
